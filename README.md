@@ -24,7 +24,7 @@ If you are on Helwan Linux, you can build and install the game using the provide
 
 ```bash
 makepkg -si
-
+---
 📄 License
 
 Copyright (c) 2026 Saeed Badreldin 
