@@ -58,11 +58,8 @@ bool line_intersection(double x1, double y1, double x2, double y2,
 void update_physics() {
     game.beam_count = 0;
     
-    // تصفير حالة الـ hit لكل الأهداف
     for(int i = 0; i < game.obj_count; i++) {
-        if (game.objects[i].type == OBJ_TARGET) {
-            game.objects[i].hit = false;
-        }
+        if (game.objects[i].type == OBJ_TARGET) game.objects[i].hit = false;
     }
 
     if (game.game_over && !game.level_cleared) return;
@@ -73,76 +70,63 @@ void update_physics() {
     Color l_color = {0.0, 1.0, 0.8};
 
     for (int bounce = 0; bounce < 12; bounce++) {
+        double next_x = cur_x + cos(cur_angle) * 3000;
+        double next_y = cur_y + sin(cur_angle) * 3000;
+        double closest_dist = 3000;
+        int hit_idx = -1;
+        bool hit_target = false;
+        double ix, iy;
 
-        // 🔥 --- تحقق من إصابة الهدف (دائرة) ---
         for (int i = 1; i < game.obj_count; i++) {
-            if (game.objects[i].type == OBJ_TARGET) {
-                double dx = game.objects[i].x - cur_x;
-                double dy = game.objects[i].y - cur_y;
+            GameObject *obj = &game.objects[i];
 
+            if (obj->type == OBJ_TARGET) {
+                // فحص تصادم الهدف (الدائرة)
+                double dx = obj->x - cur_x;
+                double dy = obj->y - cur_y;
                 double proj = dx * cos(cur_angle) + dy * sin(cur_angle);
-
                 if (proj > 0) {
-                    double closest_x = cur_x + cos(cur_angle) * proj;
-                    double closest_y = cur_y + sin(cur_angle) * proj;
-
-                    double dist = hypot(closest_x - game.objects[i].x,
-                                        closest_y - game.objects[i].y);
-
+                    double cx = cur_x + cos(cur_angle) * proj;
+                    double cy = cur_y + sin(cur_angle) * proj;
+                    double dist = hypot(cx - obj->x, cy - obj->y);
                     if (dist <= TARGET_RADIUS) {
-                        game.beams[game.beam_count++] =
-                            (Beam){cur_x, cur_y, closest_x, closest_y, l_color};
-
-                        game.objects[i].hit = true;
-                        game.level_cleared = true;
-                        return;
+                        double d_to_t = hypot(cx - cur_x, cy - cur_y);
+                        if (d_to_t < closest_dist) {
+                            closest_dist = d_to_t;
+                            next_x = cx; next_y = cy;
+                            hit_idx = i; hit_target = true;
+                        }
+                    }
+                }
+            } else {
+                // فحص تصادم الجدران والمرايا
+                double x3 = obj->x - cos(obj->angle) * obj->length / 2;
+                double y3 = obj->y - sin(obj->angle) * obj->length / 2;
+                double x4 = obj->x + cos(obj->angle) * obj->length / 2;
+                double y4 = obj->y + sin(obj->angle) * obj->length / 2;
+                if (line_intersection(cur_x, cur_y, next_x, next_y, x3, y3, x4, y4, &ix, &iy)) {
+                    double dist = hypot(ix - cur_x, iy - cur_y);
+                    if (dist < closest_dist && dist > 1.0) {
+                        closest_dist = dist;
+                        next_x = ix; next_y = iy;
+                        hit_idx = i; hit_target = false;
                     }
                 }
             }
         }
 
-        double next_x = cur_x + cos(cur_angle) * 3000;
-        double next_y = cur_y + sin(cur_angle) * 3000;
-        double closest_dist = 3000;
-        int hit_idx = -1;
-        double ix, iy;
-
-        // البحث عن أقرب اصطدام (مرايا / جدران)
-        for (int i = 1; i < game.obj_count; i++) {
-            GameObject *obj = &game.objects[i];
-
-            if (obj->type == OBJ_TARGET) continue; // هدف اتحسب فوق
-
-            double x3 = obj->x - cos(obj->angle) * obj->length / 2;
-            double y3 = obj->y - sin(obj->angle) * obj->length / 2;
-            double x4 = obj->x + cos(obj->angle) * obj->length / 2;
-            double y4 = obj->y + sin(obj->angle) * obj->length / 2;
-
-            if (line_intersection(cur_x, cur_y, next_x, next_y, x3, y3, x4, y4, &ix, &iy)) {
-                double dist = hypot(ix - cur_x, iy - cur_y);
-                if (dist < closest_dist && dist > 1.0) {
-                    closest_dist = dist;
-                    next_x = ix;
-                    next_y = iy;
-                    hit_idx = i;
-                }
-            }
-        }
-
-        // رسم الشعاع
         game.beams[game.beam_count++] = (Beam){cur_x, cur_y, next_x, next_y, l_color};
 
         if (hit_idx != -1) {
-            if (game.objects[hit_idx].type == OBJ_MIRROR) {
+            if (hit_target) {
+                game.objects[hit_idx].hit = true;
+                game.level_cleared = true; // الفوز هنا حقيقي لأنه الأقرب
+                break;
+            } else if (game.objects[hit_idx].type == OBJ_MIRROR) {
                 cur_angle = 2 * game.objects[hit_idx].angle - cur_angle;
-                cur_x = next_x;
-                cur_y = next_y;
-            } else {
-                break; // جدار
-            }
-        } else {
-            break;
-        }
+                cur_x = next_x; cur_y = next_y;
+            } else break; // جدار
+        } else break;
     }
 }
 
@@ -184,11 +168,14 @@ void load_level(int level) {
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 400, 350, M_PI/4, 80, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 400, 100, 0, 0, false, false};
     } else if (level == 2) {
-        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 400, 350, 0, 200, false, false};
-        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200, 500, M_PI/3, 80, false, true};
-        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 500, -M_PI/4, 80, false, true};
-        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 350, 0, 0, false, false};
-    } else if (level == 3) {
+		// اجعل زاوية مصدر الشعاع (Object 0) تشير للأسفل بدلاً من اليمين
+		game.objects[0].angle = M_PI / 2; 
+		
+		game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 400, 350, 0, 200, false, false};
+		game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200, 500, 0, 80, false, true}; 
+		game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 500, 0, 80, false, true};
+		game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 350, 0, 0, false, false};
+	} else if (level == 3) {
         game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 300, 150, 0, 100, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 600, 550, 0, 100, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 300, 250, M_PI/2, 70, false, true};
