@@ -1,1 +1,30 @@
+[Desktop Entry]
+# اسم اللعبة اللي هيظهر للمستخدم
+Name=Helwan Prism Ultimate
+Name[ar]=حلوان بريزم - تحدي العباقرة
 
+# وصف مختصر يظهر عند الوقوف بالماوس
+Comment=Master the lasers, solve the puzzles. Built for Helwan Linux.
+Comment[ar]=احترف الليزر وحل الألغاز. صُممت خصيصاً لحلوان لينكس.
+
+# المسار التنفيذي للعبة (تأكد من وضع المسار الصحيح لملف الـ Binary)
+Exec=/usr/bin/helwan-prism
+
+# أيقونة اللعبة (تأكد من تسمية الصورة icon.png ووضعها في مسار الأيقونات)
+Icon=helwan-prism
+
+# نوع الملف
+Type=Application
+
+# التصنيفات (عشان تظهر في قائمة Games و Logic و Education)
+Categories=Game;LogicGame;Education;GTK;
+
+# تشغيل في الترمينال (False لأننا بنستخدم GTK)
+Terminal=false
+
+# الكلمات المفتاحية للبحث
+Keywords=laser;puzzle;physics;helwan;linux;
+Keywords[ar]=ليزر;لغز;فيزياء;حلوان;لينكس;
+
+# لقطة ذكاء: بتعرف النظام إن اللعبة بتدعم الـ High DPI
+StartupNotify=true
