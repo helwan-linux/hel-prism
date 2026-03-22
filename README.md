@@ -24,27 +24,3 @@ If you are on Helwan Linux, you can build and install the game using the provide
 
 ```bash
 makepkg -si
-
-## 📄 License
-
-Copyright (c) 2026 Saeed Badreldin 
-
-This software is released under the GPL (GNU General Public License).
-
-You are free to:
-
-    Use: Run the game for any purpose.
-
-    Study: Examine the source code (helwan-prism.c) to see how it works.
-
-    Share: Copy and distribute the game to your friends.
-
-    Modify: Improve the game and share your improvements with the community.
-
-Conditions:
-
-    If you redistribute the software, you must provide the source code and keep the original license.
-
-    The software is provided "as is", without warranty of any kind.
-
-Developed with ❤️ in Egypt for the Helwan Linux Project.
