@@ -182,7 +182,64 @@ void load_level(int level) {
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 650, -M_PI/6, 70, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 700, 100, M_PI/4, 70, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 600, 0, 0, false, false};
-    } else { load_level(1); }
+        
+    } else if (level == 4) {
+        // مرحلة "الزاوية الضيقة"
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 375, M_PI/2, 400, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200, 100, M_PI/4, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 800, 100, -M_PI/4, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 800, 600, 0, 0, false, false};
+
+    } else if (level == 5) {
+        // مرحلة "المتاهة المزدوجة"
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 300, 200, 0, 300, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 700, 500, 0, 300, false, false};
+        for(int i=0; i<3; i++) 
+            game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 150+i*200, 400, 0, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 100, 0, 0, false, false};
+
+    } else if (level == 6) {
+        // مرحلة "السد العالي" (تحتاج انعكاسات دقيقة)
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 0, M_PI/2, 600, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 100, 600, -M_PI/4, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 900, 600, M_PI/4, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 950, 50, 0, 0, false, false};
+
+    } else if (level == 7) {
+        // مرحلة "الفخ"
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 400, 350, M_PI/4, 150, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 600, 350, -M_PI/4, 150, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 100, 0, 100, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 500, 700, 0, 0, false, false};
+
+    } else if (level == 8) {
+        // مرحلة "الأقواس"
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 300, 100, M_PI/6, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 700, 100, -M_PI/6, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 500, M_PI/2, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 50, 50, 0, 0, false, false};
+
+    } else if (level == 9) {
+        // مرحلة "التعقيد"
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 200, 200, 0, 200, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 800, 500, M_PI/2, 200, false, false};
+        for(int i=0; i<4; i++)
+             game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 100+i*200, 650, 0, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
+
+    } else if (level == 10) {
+        // "المرحلة النهائية" - Helwan Ultimate Challenge
+        game.time_left = 30; // وقت أقل للتحدي
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 375, 0, 800, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 375, M_PI/2, 600, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 100, 100, 0, 50, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 900, 100, 0, 50, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 100, 650, 0, 50, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 650, 0, 0, false, false};
+    }
+    
+    else { load_level(1); }
+    
 }
 
 // --- UI ---
