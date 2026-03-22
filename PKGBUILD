@@ -1,8 +1,8 @@
 # Maintainer: Saeed Badreldin <helwanlinux@gmail.com> 
 pkgname=hel-prism
-pkgver=1.0
+pkgver=1.1  # تم تحديث الإصدار لدعم المراحل اللانهائية
 pkgrel=1
-pkgdesc="A physics-based laser puzzle game for Helwan Linux" 
+pkgdesc="A physics-based laser puzzle game for Helwan Linux with infinite levels" 
 arch=('x86_64') 
 url="https://github.com/helwan-linux/hel-prism" 
 license=('GPL') 
@@ -13,8 +13,8 @@ md5sums=('SKIP')
 
 build() {
     cd "$srcdir/hel-prism/helwan-prism" 
-    # تجميع الكود المصدري وربط المكتبات 
-    gcc helwan-prism.c -o helwan-prism $(pkg-config --cflags --libs gtk+-3.0) -lm 
+    # إضافة levels.c إلى أمر التجميع 
+    gcc helwan-prism.c levels.c -o helwan-prism $(pkg-config --cflags --libs gtk+-3.0) -lm 
 }
 
 package() {
@@ -26,6 +26,6 @@ package() {
     # 2. تثبيت ملف الـ Desktop 
     install -Dm644 helwan-prism.desktop "$pkgdir/usr/share/applications/helwan-prism.desktop" 
 
-    # 3. الحل الأكيد: تثبيت الأيقونة في pixmaps لضمان الظهور الفوري بدون كاش 
+    # 3. تثبيت الأيقونة [cite: 2]
     install -Dm644 icon.png "$pkgdir/usr/share/pixmaps/helwan-prism.png"
 }
