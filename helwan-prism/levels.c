@@ -4,11 +4,11 @@
 
 #define INITIAL_TIME 60
 #define MAX_OBJECTS 20
-#define MAX_BEAMS 100 // يجب تعريف الماكس هنا أيضاً
+#define MAX_BEAMS 100
 
-typedef enum { OBJ_SOURCE, OBJ_MIRROR, OBJ_TARGET, OBJ_WALL } ObjType;
+typedef enum { OBJ_SOURCE, OBJ_MIRROR, OBJ_TARGET, OBJ_WALL, OBJ_LENS } ObjType;
 typedef struct { double r, g, b; } Color;
-typedef struct { double x1, y1, x2, y2; Color color; } Beam; // تعريف Beam بالكامل
+typedef struct { double x1, y1, x2, y2; Color color; } Beam;
 
 typedef struct {
     ObjType type;
@@ -20,7 +20,7 @@ typedef struct {
 extern struct {
     GameObject objects[MAX_OBJECTS];
     int obj_count;
-    Beam beams[MAX_BEAMS]; // يجب أن تكون مصفوفة بنفس الحجم، وليس void*
+    Beam beams[MAX_BEAMS];
     int beam_count;
     int dragged_obj_idx;
     bool is_rotating;
@@ -140,18 +140,104 @@ void load_level(int level) {
         
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 400, 0, 0, false, false};
 	}
-     else if (level >= 14) {
-        // توليد مرحلة عشوائية "ذكية"
+     else if (level == 14) {
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 500, 350, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
+    } else if (level == 15) {
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 300, 200, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 500, M_PI/4, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 800, 100, 0, 0, false, false};
+    } else if (level == 16) {
+        game.time_left = 40;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 350, M_PI/2, 400, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 350, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 700, 150, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 350, 0, 0, false, false};
+    } else if (level == 17) {
+        game.time_left = 35;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 400, 200, 0, 300, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 600, 600, 0, 300, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 400, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 300, M_PI/3, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 100, 0, 0, false, false};
+    } else if (level == 18) {
+        game.time_left = 30;
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 300, 300, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 600, 400, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 450, 500, M_PI/6, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 800, 200, 0, 0, false, false};
+    } else if (level == 19) {
+        game.time_left = 45;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 500, M_PI/2, 500, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 250, 250, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 750, 250, -M_PI/4, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 750, 600, 0, 0, false, false};
+    } else if (level == 20) {
+        game.time_left = 25;
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 100, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 600, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 350, 0, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
+    } else if (level == 21) {
+        game.time_left = 50;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 300, 300, M_PI/2, 200, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 150, 150, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 600, M_PI/3, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 800, 50, 0, 0, false, false};
+    } else if (level == 22) {
+        game.time_left = 40;
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 400, 400, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200, 200, M_PI/4, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 600, -M_PI/4, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 100, 0, 0, false, false};
+    } else if (level == 23) {
+        game.time_left = 35;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 200, 0, 600, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 500, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 800, 500, M_PI/2, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
+    } else if (level == 24) {
+        game.time_left = 30;
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 300, 200, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 300, 500, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 350, M_PI/6, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 600, 0, 0, false, false};
+    } else if (level == 25) {
+        game.time_left = 45;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 400, 500, M_PI/2, 300, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 300, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 200, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 700, 700, 0, 0, false, false};
+    } else if (level == 26) {
+        game.time_left = 40;
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 150, 350, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 450, 350, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 750, 350, M_PI/2, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
+    } else if (level == 27) {
+        game.time_left = 35;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 600, 400, 0, 400, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 300, 500, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 700, 200, -M_PI/6, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 600, 0, 0, false, false};
+    } else if (level == 28) {
+        game.time_left = 30;
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 200, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 400, 400, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 200, M_PI/3, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 500, 0, 0, false, false};
+    } else if (level == 29) {
+        game.time_left = 45;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 300, 600, M_PI/2, 400, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 150, 200, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 200, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 750, 500, 0, 0, false, false};
+    } else if (level == 30) {
         game.time_left = 60;
-        // وضع الهدف في مكان عشوائي في النصف اليمين من الشاشة
-        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 700 + rand()%200, 100 + rand()%500, 0, 0, false, false};
-        
-        // وضع 3 مرايا في أماكن عشوائية
-        for(int i=0; i<3; i++) {
-            game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200 + rand()%400, 100 + rand()%500, (rand()%360)*M_PI/180.0, 70, false, true};
-        }
-        
-        // وضع حائط عائق في المنتصف
-        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 375, (rand()%2)*M_PI/2, 300, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 100, 0, 800, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 400, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 400, 600, 0, 0, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 700, 400, M_PI/2, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 400, 0, 0, false, false};
     }
 }
