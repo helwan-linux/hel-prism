@@ -47,7 +47,7 @@ void load_level(int level) {
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 400, 350, M_PI/4, 80, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 400, 100, 0, 0, false, false};
     } else if (level == 2) {
-        game.objects[0].angle = M_PI / 2; 
+        game.objects[0].angle = M_PI / 3; 
         game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 400, 350, 0, 200, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200, 500, 0, 80, false, true}; 
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 500, 0, 80, false, true};

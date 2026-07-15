@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
+//gcc -o helwan_game helwan-prism.c levels.c `pkg-config --cflags --libs gtk+-3.0` -lm
 
 
 void load_level(int level);
