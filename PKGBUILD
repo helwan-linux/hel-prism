@@ -1,7 +1,7 @@
 # Maintainer: Saeed Badreldin <helwanlinux@gmail.com> 
 pkgname=hel-prism
-pkgver=1.1  # تم تحديث الإصدار لدعم المراحل اللانهائية
-pkgrel=2
+pkgver=1.2  # تم تحديث الإصدار لدعم المراحل اللانهائية
+pkgrel=3
 pkgdesc="A physics-based laser puzzle game for Helwan Linux with infinite levels" 
 arch=('x86_64') 
 url="https://github.com/helwan-linux/hel-prism" 
