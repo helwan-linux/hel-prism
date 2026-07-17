@@ -227,6 +227,7 @@ void load_level(int level) {
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 600, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 350, 0, 80, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 450, 0, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200, 250, 0, 30, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
     } else if (level == 21) {
         game.time_left = 50;
@@ -251,7 +252,7 @@ void load_level(int level) {
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 500, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 800, 500, M_PI/2, 60, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 400, 300, M_PI/2, 60, false, true};
-        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 700, 150, 0, 0, false, false};
     } else if (level == 24) {
         game.time_left = 30;
         game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 300, 200, 0, 600, false, false};
