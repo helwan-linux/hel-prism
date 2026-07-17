@@ -239,58 +239,85 @@ void load_level(int level) {
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 800, 50, 0, 0, false, false};
     } else if (level == 22) {
         game.time_left = 40;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 300, 300, M_PI/2, 200, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 400, 400, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200, 200, M_PI/4, 70, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 600, -M_PI/4, 70, false, true};
-        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 100, 0, 0, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 700, 100, 0, 0, false, false};
     } else if (level == 23) {
         game.time_left = 35;
         game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 200, 0, 600, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 300, 200, 0, 600, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 500, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 800, 500, M_PI/2, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 400, 300, M_PI/2, 60, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
     } else if (level == 24) {
         game.time_left = 30;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 300, 200, 0, 600, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 200, 0, 600, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 300, 200, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 300, 500, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 350, M_PI/6, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 300, 250, M_PI/3, 80, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 600, 0, 0, false, false};
     } else if (level == 25) {
         game.time_left = 45;
         game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 400, 500, M_PI/2, 300, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 300, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 200, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 300, 100, M_PI/2, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 250, 300, M_PI/4, 60, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 700, 700, 0, 0, false, false};
     } else if (level == 26) {
         game.time_left = 40;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 600, 500, M_PI/2, 300, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 400, 500, M_PI/2, 300, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 150, 350, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 450, 350, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 750, 350, M_PI/2, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 550, 250, M_PI/2, 40, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 450, 150, M_PI/2, 30, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
     } else if (level == 27) {
         game.time_left = 35;
         game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 600, 400, 0, 400, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 200, 500, 0, 200, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 300, 0, 400, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 300, 500, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 700, 200, -M_PI/6, 60, false, true};
-        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 600, 0, 0, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 200, -M_PI/2, 30, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 400, 200, -M_PI/4, 20, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 750, 500, 0, 0, false, false};
     } else if (level == 28) {
         game.time_left = 30;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 700, 300, 0, 300, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 300, 500, 0, 100, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 250, 400, 0, 500, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 200, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 400, 400, 0, 0, false, true};
-        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 600, 200, M_PI/3, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 100, 200, M_PI/3, 30, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 400, 200, M_PI/3, 30, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200, 200, M_PI/3, 20, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 500, 0, 0, false, false};
     } else if (level == 29) {
         game.time_left = 45;
         game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 300, 600, M_PI/2, 400, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 200, 400, M_PI/2, 300, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 150, 200, 0, 0, false, true};
-        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 200, M_PI/4, 60, false, true};
-        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 750, 500, 0, 0, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 400, 150, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 350, 200, M_PI/2, 30, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 350, 200, M_PI/4, 30, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 550, 450, 0, 0, false, false};
     } else if (level == 30) {
         game.time_left = 60;
         game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 100, 0, 800, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 800, 260, 0, 800, false, false};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 200, 400, 0, 0, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_LENS, 400, 600, 0, 0, false, true};
-        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 700, 400, M_PI/2, 80, false, true};
-        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 400, 0, 0, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 400, M_PI/2, 10, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 100, 400, M_PI/2, 30, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 300, 400, M_PI/2, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 400, 250, 0, 0, false, false};
     }
 }
