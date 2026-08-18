@@ -6,7 +6,7 @@
 #define MAX_OBJECTS 20
 #define MAX_BEAMS 100
 
-typedef enum { OBJ_SOURCE, OBJ_MIRROR, OBJ_TARGET, OBJ_WALL, OBJ_LENS } ObjType;
+typedef enum { OBJ_SOURCE, OBJ_MIRROR, OBJ_TARGET, OBJ_WALL, OBJ_LENS, OBJ_SPLITTER, OBJ_SEMI_MIRROR, OBJ_MOVING_OBSTACLE } ObjType;
 typedef struct { double r, g, b; } Color;
 typedef struct { double x1, y1, x2, y2; Color color; } Beam;
 
@@ -43,7 +43,7 @@ void load_level(int level) {
     // وضع مصدر الشعاع الافتراضي
     game.objects[game.obj_count++] = (GameObject){OBJ_SOURCE, 50, 350, 0, 0, false, false};
 
-    if (level == 1) {
+         if (level == 1) {
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 400, 350, M_PI/4, 80, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 400, 100, 0, 0, false, false};
     } else if (level == 2) {
@@ -320,5 +320,96 @@ void load_level(int level) {
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 100, 400, M_PI/2, 30, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 300, 400, M_PI/2, 80, false, true};
         game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 400, 250, 0, 0, false, false};
+    }else if (level == 31) 
+        { // 1. اختبار الموشور المشتت الأساسي
+        game.time_left = 45;
+        game.objects[game.obj_count++] = (GameObject){OBJ_SPLITTER, 400, 350, 0, 40, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 200, 0, 0, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 500, 0, 0, false, false};
+		}
+    else if (level == 32) { // 2. حاجز متحرك بطيء يقطع المنتصف
+        game.time_left = 50;
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200, 600, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 800, 150, -M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MOVING_OBSTACLE, 500, 350, M_PI/2, 250, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
+    } 
+    else if (level == 33) { // 3. مرآة نصف عاكسة مع جدار حماية
+        game.time_left = 40;
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 200, 600, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 800, 150, -M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SEMI_MIRROR, 350, 350, M_PI/4, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 650, 350, M_PI/2, 300, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 150, 0, 0, false, false};
+    } 
+    else if (level == 34) { // 4. سلسلة موشورات ومرايا متتالية
+        game.time_left = 45;
+        game.objects[game.obj_count++] = (GameObject){OBJ_SPLITTER, 250, 350, 0, 40, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 550, 200, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 450, 100, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 600, 0, 0, false, false};
+    } 
+    else if (level == 35) { // 5. دمج الحاجز المتحرك مع الموشور
+        game.time_left = 35;
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 540, 300, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 250, 100, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MOVING_OBSTACLE, 350, 250, 0, 150, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SPLITTER, 650, 450, 0, 40, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 200, 0, 0, false, false};
+    } 
+    else if (level == 36) { // 6. متاهة المرايا نصف العاكسة الثلاثية
+        game.time_left = 50;
+        for(int i=0; i<3; i++) {
+            game.objects[game.obj_count++] = (GameObject){OBJ_SEMI_MIRROR, 250 + i*200, 250 + i*100, M_PI/6, 60, false, true};
+        }
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 650, 0, 0, false, false};
+    } 
+    else if (level == 37) { // 7. معمل التشتيت المزدوج
+        game.time_left = 40;
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 300, 200, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 250, 100, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SPLITTER, 300, 200, M_PI/6, 40, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SPLITTER, 600, 500, -M_PI/6, 40, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SPLITTER, 400, 250, -M_PI/6, 40, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 300, 350, 0, 0, false, false};
+    } 
+    else if (level == 38) { // 8. ثنائي الحواجز المتحركة السريعة
+        game.time_left = 30;
+        game.objects[game.obj_count++] = (GameObject){OBJ_MOVING_OBSTACLE, 400, 200, 0, 120, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MOVING_OBSTACLE, 600, 500, 0, 120, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 350, 0, 0, false, false};
+    } 
+    else if (level == 39) { // 9. شبكة المرايا المائلة المعقدة
+        game.time_left = 45;
+        game.objects[game.obj_count++] = (GameObject){OBJ_SEMI_MIRROR, 300, 500, -M_PI/4, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 500, 200, M_PI/3, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SEMI_MIRROR, 700, 400, M_PI/5, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 850, 150, 0, 0, false, false};
+    } 
+    else if (level == 40) { // 10. اختبار التوقيت الحرج (حاجز + موشور)
+        game.time_left = 30;
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 550, 200, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 450, 100, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SEMI_MIRROR, 300, 500, -M_PI/4, 80, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MOVING_OBSTACLE, 450, 350, M_PI/2, 350, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SPLITTER, 700, 350, 0, 40, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 950, 350, 0, 0, false, false};
+    } 
+    else if (level == 41) { // 11. غرفة الضغط العالي (وقت قصير جداً)
+        game.time_left = 22;
+        game.objects[game.obj_count++] = (GameObject){OBJ_WALL, 500, 200, 0, 400, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SEMI_MIRROR, 300, 400, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SPLITTER, 600, 500, -M_PI/4, 40, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 900, 100, 0, 0, false, false};
+    } 
+    else if (level == 42) { // 12. مرحلة الجحيم الأسطورية (النهائية)
+        game.time_left = 20;
+        game.objects[game.obj_count++] = (GameObject){OBJ_MOVING_OBSTACLE, 300, 350, M_PI/2, 300, false, false};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 450, 200, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_MIRROR, 450, 300, M_PI/4, 60, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SEMI_MIRROR, 500, 250, M_PI/6, 70, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_SPLITTER, 700, 450, -M_PI/6, 40, false, true};
+        game.objects[game.obj_count++] = (GameObject){OBJ_TARGET, 950, 350, 0, 0, false, false};
     }
-}
+    
+  } 

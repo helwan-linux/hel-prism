@@ -15,7 +15,7 @@ void load_level(int level);
 
 typedef struct { double r, g, b; } Color;
 typedef struct { double x1, y1, x2, y2; Color color; } Beam;
-typedef enum { OBJ_SOURCE, OBJ_MIRROR, OBJ_TARGET, OBJ_WALL } ObjType;
+typedef enum { OBJ_SOURCE, OBJ_MIRROR, OBJ_TARGET, OBJ_WALL, OBJ_LENS, OBJ_SPLITTER, OBJ_SEMI_MIRROR, OBJ_MOVING_OBSTACLE } ObjType;
 
 typedef struct {
     ObjType type;
@@ -36,6 +36,7 @@ typedef struct {
     bool game_over;
     int time_left;
     bool demo_mode;
+    double global_time; // لدعم حركة العوائق الزمنية
 } GameState;
 
 GameState game;
@@ -57,85 +58,108 @@ bool line_intersection(double x1, double y1, double x2, double y2,
     return false;
 }
 
+// دالة تتبع الأشعة مع دعم الانقسام (Recursive Beam Tracing) للـ Splitters و Semi-Mirrors
+void trace_beam(double cur_x, double cur_y, double cur_angle, Color l_color, int bounce) {
+    if (bounce > 8 || game.beam_count >= MAX_BEAMS) return;
+
+    double next_x = cur_x + cos(cur_angle) * 3000;
+    double next_y = cur_y + sin(cur_angle) * 3000;
+    double closest_dist = 3000;
+    int hit_idx = -1;
+    bool hit_target = false;
+    double ix, iy;
+
+    // حساب موقع الحواجز المتحركة مؤقتاً أثناء الفحص
+    double current_obs_x = 0, current_obs_y = 0, current_obs_angle = 0, current_obs_len = 0;
+
+    for (int i = 1; i < game.obj_count; i++) {
+        GameObject *obj = &game.objects[i];
+        double ox = obj->x;
+        double oy = obj->y;
+        double o_angle = obj->angle;
+
+        if (obj->type == OBJ_MOVING_OBSTACLE) {
+            ox += sin(game.global_time * 2.0) * 50.0; // حركة دورية بسيطة
+        }
+
+        if (obj->type == OBJ_TARGET) {
+            double dx = ox - cur_x;
+            double dy = oy - cur_y;
+            double proj = dx * cos(cur_angle) + dy * sin(cur_angle);
+            if (proj > 0) {
+                double cx = cur_x + cos(cur_angle) * proj;
+                double cy = cur_y + sin(cur_angle) * proj;
+                double dist = hypot(cx - ox, cy - oy);
+                if (dist <= TARGET_RADIUS) {
+                    double d_to_t = hypot(cx - cur_x, cy - cur_y);
+                    if (d_to_t < closest_dist) {
+                        closest_dist = d_to_t;
+                        next_x = cx; next_y = cy;
+                        hit_idx = i; hit_target = true;
+                    }
+                }
+            }
+        } else {
+            double x3 = ox - cos(o_angle) * obj->length / 2;
+            double y3 = oy - sin(o_angle) * obj->length / 2;
+            double x4 = ox + cos(o_angle) * obj->length / 2;
+            double y4 = oy + sin(o_angle) * obj->length / 2;
+            if (line_intersection(cur_x, cur_y, next_x, next_y, x3, y3, x4, y4, &ix, &iy)) {
+                double dist = hypot(ix - cur_x, iy - cur_y);
+                if (dist < closest_dist && dist > 1.0) {
+                    closest_dist = dist;
+                    next_x = ix; next_y = iy;
+                    hit_idx = i; hit_target = false;
+                    current_obs_x = ox; current_obs_y = oy; current_obs_angle = o_angle; current_obs_len = obj->length;
+                }
+            }
+        }
+    }
+
+    if (game.beam_count < MAX_BEAMS) {
+        game.beams[game.beam_count++] = (Beam){cur_x, cur_y, next_x, next_y, l_color};
+    }
+
+    if (hit_idx != -1) {
+        if (hit_target) {
+            game.objects[hit_idx].hit = true;
+            game.level_cleared = true;
+        } else {
+            ObjType type = game.objects[hit_idx].type;
+            if (type == OBJ_MIRROR) {
+                double refl_angle = 2 * game.objects[hit_idx].angle - cur_angle;
+                trace_beam(next_x, next_y, refl_angle, l_color, bounce + 1);
+            } else if (type == OBJ_SEMI_MIRROR) {
+                // يعكس جزء ويمرر جزء
+                double refl_angle = 2 * game.objects[hit_idx].angle - cur_angle;
+                trace_beam(next_x, next_y, refl_angle, (Color){l_color.r, l_color.g, l_color.b}, bounce + 1);
+                trace_beam(next_x, next_y, cur_angle, (Color){l_color.r * 0.7, l_color.g * 0.7, l_color.b * 0.7}, bounce + 1);
+            } else if (type == OBJ_SPLITTER) {
+                // يشتت الشعاع لثلاثة أشعة بزوايا مختلفة
+                trace_beam(next_x, next_y, cur_angle - 0.3, (Color){1.0, 0.2, 0.2}, bounce + 1);
+                trace_beam(next_x, next_y, cur_angle, (Color){0.2, 1.0, 0.2}, bounce + 1);
+                trace_beam(next_x, next_y, cur_angle + 0.3, (Color){0.2, 0.2, 1.0}, bounce + 1);
+            }
+        }
+    }
+}
+
 void update_physics() {
     game.beam_count = 0;
-    
     for(int i = 0; i < game.obj_count; i++) {
         if (game.objects[i].type == OBJ_TARGET) game.objects[i].hit = false;
     }
 
     if (game.game_over && !game.level_cleared) return;
 
-    double cur_x = game.objects[0].x;
-    double cur_y = game.objects[0].y;
-    double cur_angle = game.objects[0].angle;
-    Color l_color = {0.0, 1.0, 0.8};
-
-    for (int bounce = 0; bounce < 12; bounce++) {
-        double next_x = cur_x + cos(cur_angle) * 3000;
-        double next_y = cur_y + sin(cur_angle) * 3000;
-        double closest_dist = 3000;
-        int hit_idx = -1;
-        bool hit_target = false;
-        double ix, iy;
-
-        for (int i = 1; i < game.obj_count; i++) {
-            GameObject *obj = &game.objects[i];
-
-            if (obj->type == OBJ_TARGET) {
-                // فحص تصادم الهدف (الدائرة)
-                double dx = obj->x - cur_x;
-                double dy = obj->y - cur_y;
-                double proj = dx * cos(cur_angle) + dy * sin(cur_angle);
-                if (proj > 0) {
-                    double cx = cur_x + cos(cur_angle) * proj;
-                    double cy = cur_y + sin(cur_angle) * proj;
-                    double dist = hypot(cx - obj->x, cy - obj->y);
-                    if (dist <= TARGET_RADIUS) {
-                        double d_to_t = hypot(cx - cur_x, cy - cur_y);
-                        if (d_to_t < closest_dist) {
-                            closest_dist = d_to_t;
-                            next_x = cx; next_y = cy;
-                            hit_idx = i; hit_target = true;
-                        }
-                    }
-                }
-            } else {
-                // فحص تصادم الجدران والمرايا
-                double x3 = obj->x - cos(obj->angle) * obj->length / 2;
-                double y3 = obj->y - sin(obj->angle) * obj->length / 2;
-                double x4 = obj->x + cos(obj->angle) * obj->length / 2;
-                double y4 = obj->y + sin(obj->angle) * obj->length / 2;
-                if (line_intersection(cur_x, cur_y, next_x, next_y, x3, y3, x4, y4, &ix, &iy)) {
-                    double dist = hypot(ix - cur_x, iy - cur_y);
-                    if (dist < closest_dist && dist > 1.0) {
-                        closest_dist = dist;
-                        next_x = ix; next_y = iy;
-                        hit_idx = i; hit_target = false;
-                    }
-                }
-            }
-        }
-
-        game.beams[game.beam_count++] = (Beam){cur_x, cur_y, next_x, next_y, l_color};
-
-        if (hit_idx != -1) {
-            if (hit_target) {
-                game.objects[hit_idx].hit = true;
-                game.level_cleared = true; // الفوز هنا حقيقي لأنه الأقرب
-                break;
-            } else if (game.objects[hit_idx].type == OBJ_MIRROR) {
-                cur_angle = 2 * game.objects[hit_idx].angle - cur_angle;
-                cur_x = next_x; cur_y = next_y;
-            } else break; // جدار
-        } else break;
-    }
+    trace_beam(game.objects[0].x, game.objects[0].y, game.objects[0].angle, (Color){0.0, 1.0, 0.8}, 0);
 }
 
 // --- Timers & Demo ---
 gboolean game_timer_cb(gpointer data) {
     if (!game.level_cleared && !game.game_over) {
         game.time_left--;
+        game.global_time += 1.0;
         if (game.time_left <= 0) game.game_over = true;
         gtk_widget_queue_draw((GtkWidget*)data);
     }
@@ -144,12 +168,12 @@ gboolean game_timer_cb(gpointer data) {
 
 gboolean demo_timer_cb(gpointer data) {
     if (!game.demo_mode) return FALSE;
+    game.global_time += 0.1;
     for (int i = 1; i < game.obj_count; i++) {
-        if (game.objects[i].type == OBJ_MIRROR) {
+        if (game.objects[i].type == OBJ_MIRROR || game.objects[i].type == OBJ_SEMI_MIRROR) {
             game.objects[i].angle += 0.02;
         }
     }
-    // تحديث الفيزياء فوراً عشان الكورة تخضر وقت الديمو
     update_physics();
     gtk_widget_queue_draw((GtkWidget*)data);
     return TRUE;
@@ -159,8 +183,6 @@ void on_demo_clicked(GtkWidget *widget, gpointer data) {
     game.demo_mode = !game.demo_mode;
     if (game.demo_mode) g_timeout_add(30, demo_timer_cb, data);
 }
-
-
 
 // --- UI ---
 void show_about(GtkWidget *widget, gpointer data) {
@@ -176,18 +198,14 @@ void show_help(GtkWidget *widget, gpointer data) {
 }
 
 static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
-
-    // ❌ تم حذف التصفير من هنا
-
-    // تحديث الفيزياء
     update_physics();
 
     cairo_set_source_rgb(cr, 0.01, 0.01, 0.05); 
     cairo_paint(cr);
 
     for (int i = 0; i < game.beam_count; i++) {
-        cairo_set_source_rgba(cr, game.beams[i].color.r, game.beams[i].color.g, game.beams[i].color.b, 0.2);
-        cairo_set_line_width(cr, 12.0);
+        cairo_set_source_rgba(cr, game.beams[i].color.r, game.beams[i].color.g, game.beams[i].color.b, 0.3);
+        cairo_set_line_width(cr, 10.0);
         cairo_move_to(cr, game.beams[i].x1, game.beams[i].y1);
         cairo_line_to(cr, game.beams[i].x2, game.beams[i].y2);
         cairo_stroke(cr);
@@ -202,7 +220,14 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
     for (int i = 0; i < game.obj_count; i++) {
         GameObject *obj = &game.objects[i];
         cairo_save(cr);
-        cairo_translate(cr, obj->x, obj->y);
+        
+        double render_x = obj->x;
+        double render_y = obj->y;
+        if (obj->type == OBJ_MOVING_OBSTACLE) {
+            render_x += sin(game.global_time * 2.0) * 50.0;
+        }
+
+        cairo_translate(cr, render_x, render_y);
         cairo_rotate(cr, obj->angle);
 
         if (obj->type == OBJ_SOURCE) {
@@ -213,6 +238,18 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
             cairo_set_source_rgb(cr, 0.7, 0.7, 1.0); 
             cairo_rectangle(cr, -obj->length/2, -5, obj->length, 10);
         } 
+        else if (obj->type == OBJ_SEMI_MIRROR) {
+            cairo_set_source_rgb(cr, 0.5, 0.9, 0.9); // لون مختلف للمرآة النصف عاكسة
+            cairo_rectangle(cr, -obj->length/2, -4, obj->length, 8);
+        }
+        else if (obj->type == OBJ_SPLITTER) {
+            cairo_set_source_rgb(cr, 0.9, 0.5, 0.9); // موشور مشتت
+            cairo_rectangle(cr, -20, -20, 40, 40);
+        }
+        else if (obj->type == OBJ_MOVING_OBSTACLE) {
+            cairo_set_source_rgb(cr, 0.9, 0.3, 0.1); // حاجز متحرك
+            cairo_rectangle(cr, -obj->length/2, -10, obj->length, 20);
+        }
         else if (obj->type == OBJ_TARGET) {
             if (obj->hit || game.level_cleared) {
                 cairo_set_source_rgb(cr, 0.0, 1.0, 0.0);
@@ -252,6 +289,7 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
 
     return FALSE;
 }
+
 static gboolean on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data) {
     if (event->keyval == GDK_KEY_Escape) { load_level(game.current_level); gtk_widget_queue_draw(widget); }
     if (event->keyval == GDK_KEY_space && game.level_cleared) {
@@ -288,7 +326,7 @@ static gboolean on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer dat
 
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
-    load_level(1); game.dragged_obj_idx = -1;
+    load_level(1); game.dragged_obj_idx = -1; game.global_time = 0.0;
 
     GtkWidget *win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(win), "Helwan Prism Ultimate");
